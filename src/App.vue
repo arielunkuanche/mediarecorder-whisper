@@ -54,7 +54,6 @@ const transcribeChunk = async (chunk) => {
 
   isTranscribing.value = true;
   const key = import.meta.env.VITE_OPENAI_API_KEY;
-  console.log("key ", import.meta.env.VITE_OPENAI_API_KEY);
   try {
     const res = await fetch('https://api.openai.com/v1/audio/transcriptions', {
       method: 'POST',
@@ -114,6 +113,14 @@ const startRecording = async () => {
       chunks.push(chunkBlob);
       validChunksQueue.value.push(chunkBlob);
 
+      const url = URL.createObjectURL(chunkBlob);
+      const downloadLink = document.createElement('a');
+      downloadLink.href = url;
+      downloadLink.download = `chunk -${Date.now().webm}`;
+      downloadLink.textContent = 'Download Chunk Blob';
+      document.body.appendChild(downloadLink);
+
+
       if (!isProcessingQueue.value) processNextChunk();
     } else {
       console.log("Chunk is empty or too small in startRecording.");
@@ -170,13 +177,32 @@ onMounted(() => {
 });
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+<style scoped>
+.container {
+  max-width: 700px;
+  margin: 2rem auto;
+  font-family: Arial, sans-serif;
+}
+.buttons {
+  margin-bottom: 1rem;
+}
+button {
+  margin-right: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+}
+.history-list {
+  list-style: none;
+  padding: 0;
+}
+.history-list li {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+audio {
+  display: block;
+  margin-top: 8px;
 }
 </style>
